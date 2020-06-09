@@ -15,8 +15,8 @@ public final class ItemTestingView<Content:ItemContent> : UIView {
     
     public init(
         _ content : Content,
-        sizing : Sizing,
-        width : CGFloat,
+        sizing : Sizing = .thatFits,
+        width : CGFloat = UIScreen.main.bounds.size.width,
         maxHeight : CGFloat = .greatestFiniteMagnitude,
         state : ItemState = .init(isSelected: false, isHighlighted: false),
         position : ItemPosition = .single,

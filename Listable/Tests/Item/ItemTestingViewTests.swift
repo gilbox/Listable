@@ -16,8 +16,6 @@ class ItemTestingViewTests : XCTestCase
     {
         let view = ItemTestingView(
             TestContent(text: "Hello, World!"),
-            sizing: .thatFits,
-            width: 200.0,
             state: ItemState(isSelected: false, isHighlighted: true)
         )
         

@@ -449,7 +449,14 @@ final class DefaultListLayout : ListLayout
             // Add additional padding from config.
             
             if isLast == false {
-                let additionalSectionSpacing = hasSectionFooter ? layout.interSectionSpacingWithFooter : layout.interSectionSpacingWithNoFooter
+                let additionalSectionSpacing: CGFloat
+                if let customSpacing = section.layout.customSpacing {
+                    additionalSectionSpacing = customSpacing
+                } else {
+                    additionalSectionSpacing = hasSectionFooter
+                        ? layout.interSectionSpacingWithFooter
+                        : layout.interSectionSpacingWithNoFooter
+                }
                 
                 lastSectionMaxY += additionalSectionSpacing
                 lastContentMaxY += additionalSectionSpacing

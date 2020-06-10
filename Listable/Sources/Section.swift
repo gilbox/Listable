@@ -152,10 +152,13 @@ public extension Section
     struct Layout : Equatable
     {
         public var width : CustomWidth
+
+        public var customSpacing : CGFloat?
         
-        public init(width : CustomWidth = .default)
+        public init(width : CustomWidth = .default, customSpacing : CGFloat? = nil)
         {
             self.width = width
+            self.customSpacing = customSpacing
         }
     }
     

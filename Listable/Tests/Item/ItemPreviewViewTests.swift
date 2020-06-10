@@ -1,5 +1,5 @@
 //
-//  ItemTestingViewTests.swift
+//  ItemPreviewViewTests.swift
 //  Listable-Unit-Tests
 //
 //  Created by Kyle Van Essen on 6/8/20.
@@ -10,16 +10,11 @@ import Listable
 
 
 
-class ItemTestingViewTests : XCTestCase
+class ItemPreviewViewTests : XCTestCase
 {
     func test_view()
     {
-        let view = ItemTestingView {
-            $0.set(
-                Item(TestContent(text: "Hello, World!")),
-                itemState: ItemState(isSelected: false, isHighlighted: true)
-            )
-        }
+        let view = ItemPreviewView(Item(TestContent(text: "Hello, World!")))
         
         print("")
     }

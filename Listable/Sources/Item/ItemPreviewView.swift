@@ -1,5 +1,5 @@
 //
-//  ItemTestingView.swift
+//  ItemPreviewView.swift
 //  Listable
 //
 //  Created by Kyle Van Essen on 6/8/20.
@@ -12,15 +12,26 @@ public final class ItemPreviewView<Content:ItemContent> : UIView {
             
     let listView : ListView
     
-    public init(width : CGFloat = UIScreen.main.bounds.width, _ configure : (ItemPreviewView<Content>) -> () = { _ in })
+    public init(width : CGFloat = UIScreen.main.bounds.width)
     {
-        self.listView = ListView(frame: CGRect(x: 0.0, y: 0.0, width: width, height: 100.0))
+        let frame = CGRect(x: 0.0, y: 0.0, width: width, height: 100.0)
         
-        super.init(frame: CGRect(x: 0.0, y: 0.0, width: width, height: 100.0))
+        self.listView = ListView(frame: frame)
         
-        configure(self)
+        super.init(frame: frame)
         
         self.addSubview(self.listView)
+    }
+    
+    public convenience init(
+        _ item : Item<Content>,
+        width : CGFloat = UIScreen.main.bounds.width,
+        itemState : ItemState = .init(isSelected: false, isHighlighted: false),
+        appearance : (inout Appearance) -> () = { _ in }
+    ) {
+        self.init(width: width)
+        
+        self.set(item, width: width, itemState: itemState, appearance: appearance)
     }
     
     public func set(
@@ -57,6 +68,11 @@ public final class ItemPreviewView<Content:ItemContent> : UIView {
         super.layoutSubviews()
         
         self.listView.frame = self.bounds
+    }
+    
+    public override func sizeThatFits(_ size: CGSize) -> CGSize
+    {
+        self.listView.layout.layout.content.contentSize
     }
 
 }

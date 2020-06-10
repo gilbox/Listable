@@ -10,61 +10,42 @@ import UIKit
 
 public final class ItemTestingView<Content:ItemContent> : UIView {
             
-    let cell : ItemCell<Content>
-    let presentationState : PresentationState.ItemState<Content>
+    let listView : ListView
     
-    public init(
-        _ content : Content,
-        sizing : Sizing = .thatFits,
-        width : CGFloat = UIScreen.main.bounds.size.width,
-        maxHeight : CGFloat = .greatestFiniteMagnitude,
-        state : ItemState = .init(isSelected: false, isHighlighted: false),
-        position : ItemPosition = .single,
-        padding : UIEdgeInsets = .zero,
-        background : UIColor = .white
+    public init(width : CGFloat = UIScreen.main.bounds.width, _ configure : (ItemTestingView<Content>) -> ())
+    {
+        self.listView = ListView(frame: CGRect(x: 0.0, y: 0.0, width: width, height: 100.0))
+        
+        super.init(frame: CGRect(x: 0.0, y: 0.0, width: width, height: 100.0))
+        
+        configure(self)
+    }
+    
+    public func set(
+        _ item : Item<Content>,
+        itemState : ItemState = .init(isSelected: false, isHighlighted: false),
+        appearance : (inout Appearance) -> () = { _ in }
     ) {
-        self.cell = ItemCell<Content>()
+        self.listView.setContent { list in
+            appearance(&list.appearance)
+            
+            list += Section(identifier: "section") { section in
+                section += item
+            }
+        }
         
-        self.cell.isSelected = state.isSelected
-        self.cell.isHighlighted = state.isHighlighted
+        self.listView.collectionView.layoutIfNeeded()
         
-        let item = Item(
-            content,
-            sizing: sizing
-        )
+        let indexPath = IndexPath(item: 0, section: 0)
         
-        item.content.apply(
-            to: ItemContentViews(
-                content: self.cell.contentContainer.contentView,
-                background: self.cell.background,
-                selectedBackground: self.cell.selectedBackground
-            ),
-            for: .willDisplay,
-            with: ApplyItemContentInfo(state: state, position: position, reordering: ReorderingActions())
-        )
+        let cell = self.listView.collectionView.cellForItem(at: indexPath)!
+        let state = self.listView.storage.presentationState.item(at: indexPath)
         
-        self.presentationState = PresentationState.ItemState(
-            with: item,
-            dependencies: ItemStateDependencies(
-                reorderingDelegate: ReorderingStub(),
-                coordinatorDelegate: ItemContentCoordinatorStub()
-            )
-        )
+        state.applyTo(cell: cell, itemState: itemState, reason: .willDisplay)
         
-        let cache = ReusableViewCache()
-        
-        let measured = self.presentationState.size(
-            in: CGSize(width: width, height: maxHeight),
-            layoutDirection: .vertical,
-            defaultSize: CGSize(width: width, height: 100.0),
-            measurementCache: cache
-        )
-        
-        super.init(frame: CGRect(origin: .zero, size: CGSize(width: width, height: measured.height)))
-        
-        self.backgroundColor = background
-        
-        self.addSubview(self.cell)
+        self.frame.size.height = self.listView.layout.layout.content.contentSize.height
+                        
+        self.addSubview(self.listView)
     }
     
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError() }
@@ -72,20 +53,7 @@ public final class ItemTestingView<Content:ItemContent> : UIView {
     public override func layoutSubviews() {
         super.layoutSubviews()
         
-        self.cell.frame = self.bounds
+        self.listView.frame = self.bounds
     }
-    
-    private final class ReorderingStub : ReorderingActionsDelegate {
-        func beginInteractiveMovementFor(item: AnyPresentationItemState) -> Bool { false }
-        
-        func updateInteractiveMovementTargetPosition(with recognizer: UIPanGestureRecognizer) {}
-        
-        func endInteractiveMovement() {}
-        
-        func cancelInteractiveMovement() {}
-    }
-    
-    private final class ItemContentCoordinatorStub : ItemContentCoordinatorDelegate {
-        func coordinatorUpdated(for item: AnyItem, animated: Bool) {}
-    }
+
 }

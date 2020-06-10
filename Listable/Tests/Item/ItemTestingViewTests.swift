@@ -14,10 +14,12 @@ class ItemTestingViewTests : XCTestCase
 {
     func test_view()
     {
-        let view = ItemTestingView(
-            TestContent(text: "Hello, World!"),
-            state: ItemState(isSelected: false, isHighlighted: true)
-        )
+        let view = ItemTestingView {
+            $0.set(
+                Item(TestContent(text: "Hello, World!")),
+                itemState: ItemState(isSelected: false, isHighlighted: true)
+            )
+        }
         
         print("")
     }
